@@ -15,9 +15,7 @@ class AdminCtrl extends Controller
 
     public function adminProduct()
     {
-        $tableData = Product::all();
-        
-        return view('admin_product', array('tableData' => $tableData ));
+        return view('admin_product');
     }  
 
     public function productSave(Request $request){
@@ -26,7 +24,16 @@ class AdminCtrl extends Controller
         $product->quantity_in_stock = $request->input('quantity_in_stock');
         $product->price_per_item = $request->input('price_per_item');
         $product->save();
-
-        return "sucess.";
+        $data = array('result' => 'sucess');
+        return $data;
+        //return response($data, 200)
+        //          ->header('Content-Type', 'text/json');
+        
     }
+
+    public function productGet(Request $request){
+        $tableData = Product::all();
+        return $tableData;
+    }
+
 }

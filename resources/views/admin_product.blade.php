@@ -72,11 +72,8 @@
           </div>
         </footer>
     </div>
-
-<script>
-   //define some sample data
-   var tabledata ={!! $tableData !!}; 
-</script>
+<!-- Moment -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
 <!-- JQuery -->
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 <!-- Tabulator UNPKG -->     
@@ -85,7 +82,6 @@
 <script>
 
     var table = new Tabulator("#product-table", {
-      data:tabledata,           //load row data from array
       layout:"fitColumns",      //fit columns to width of table
       responsiveLayout:"hide",  //hide columns that dont fit on the table
       tooltips:true,            //show tool tips on cells
@@ -100,19 +96,32 @@
       ],
       columns:[                 //define the table columns
         {title:"Id", field:"id", editor:false,align:"center",width:13},
-        {title:"Product Name", field:"product_name", editor:false,  widthGrow:3 },
+        {title:"Product Name", field:"product_name", editor:false,  widthGrow:3 , headerFilter:true},
         {title:"Quantity In Stock", field:"quantity_in_stock", width:160, sorter:"number", align:"center", editor:false},
         {title:"Price Per Item", field:"price_per_item", width:135, sorter:"number", align:"center", editor:false},
-        {title:"Created At", field:"created_at", width:130, sorter:"date",sorterParams:{
-          format:"MM/DD/YYYY",
+        {title:"Created At", field:"created_at", formatter:"datetime", 
+          formatterParams:{
+            inputFormat:"YYYY-MM-DD",
+            outputFormat:"MM/DD/YYYY",
+            invalidPlaceholder:"(invalid date)",
+          },
+          width:130, sorter:"date",sorterParams:{
+          format:"YYYY-MM-DD",
           alignEmptyValues:"top",
       } ,align:"center"},
-        {title:"Updated At", field:"updated_at", width:130, sorter:"date", sorterParams:{
-          format:"MM/DD/YYYY",
+        {title:"Updated At", field:"updated_at",formatter:"datetime", 
+          formatterParams:{
+            inputFormat:"YYYY-MM-DD",
+            outputFormat:"MM/DD/YYYY",
+            invalidPlaceholder:"(invalid date)",
+          }, 
+          width:130, sorter:"date", sorterParams:{
+          format:"YYYY-MM-DD",
           alignEmptyValues:"top",
       } , align:"center"},
       ],
-    }); 
+    });
+    table.setData("/product_get"); 
 </script>
 
 <script>
@@ -122,10 +131,10 @@
     jQuery('#product_form').submit(function(e) {
         save_product();
     });
-     //$('#submit_but').click(function(e) {
-     // event.preventDefault();
-     // save_product();
-     // });
+     $('#submit_but').click(function(e) {
+      event.preventDefault();
+      save_product();
+      });
 
   });
   const xCsrfToken = "{{ csrf_token() }}";
@@ -138,19 +147,26 @@
   var save_product = function() {
    console.log('inside save_product');
     var data_string = $("#product_form").serialize();
-    console.log(data_string);
     $.ajax({
         type: 'post',
         url: '/product_save?'+data_string,
-        dataType: 'JSON', //Make sure your returning data type dffine as json
+        dataType: 'json', //Make sure your returning data type dffine as json
         data: {
-          _token:xCsrfToken,    
+          _token : xCsrfToken,
         },
         success: function(data) {
-            console.log(data); //Please share cosnole data
+           console.log('success!');
+           console.log('result:',data.result); //Please share cosnole data
+        },
+        error(xhr,status,error){
+          console.log('xhr:',xhr);
+          console.log('status:',status);
+          console.log('error:',error);
         }
     });
+    table.setData("/product_get");
   }
+  
  </script>
 
 @endsection

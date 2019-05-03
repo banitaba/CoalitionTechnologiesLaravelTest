@@ -17,5 +17,6 @@
 Route::get('/', 'AdminCtrl@adminProduct');
 Route::get('/products', 'AdminCtrl@adminProduct');
 Route::post('/product_save', 'AdminCtrl@productSave');
+Route::get('/product_get', 'AdminCtrl@productGet');
 Auth::routes();
 
